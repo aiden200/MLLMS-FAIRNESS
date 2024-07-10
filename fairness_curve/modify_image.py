@@ -4,7 +4,7 @@ import numpy as np
 def blur(filepath, amount=5, savepath=None):
 
     image = cv2.imread(filepath)
-    blurred_image = cv2.GaussianBlur(image, (amount, amount), amount)
+    blurred_image = cv2.GaussianBlur(image, (amount, amount), 0)
     cv2.imwrite(savepath, blurred_image)
 
 
