@@ -5,7 +5,7 @@ import time
 from tqdm import tqdm
 
 
-DEBUG = False
+DEBUG = True
 
 def parse_gpt_results(response):
     json_regex = r'```json(.*?)```'
@@ -28,7 +28,9 @@ def response_one_file(filename):
     trials = 10
     
     true_values = obtain_values(filename)
-    print(true_values)
+    
+    if DEBUG:
+        print(true_values)
     
     number_of_people = true_values["people"]
     aa_count = true_values["race"].count("African American")
@@ -52,22 +54,22 @@ def response_one_file(filename):
     
     for attribute in ["race", "gender"]:
         for i in range(trials):
-            response, code = load_gpt_4(filename, attribute=attribute)
             ticker = 20
 
             while True:
+                response, code = load_gpt_4(filename, attribute=attribute)
                 if ticker == 0:
                     print("maximum quality degration achieved")
 
                 elif code == -1:
                     if DEBUG:
                         print(response)
-                    print("Rate limit reached, sleeping for 60 seconds")
+                    print("Rate limit reached, sleeping for 30 seconds")
                     time.sleep(30)
                 elif "I'm sorry" in response:
                     if DEBUG:
-                        print("Refused to respond, retring")
-                    response, code = load_gpt_4(filename, attribute="race")
+                        print("Refused to respond, retrying")
+                        print(response)
                     ticker -= 1
                 else:
                     response = parse_gpt_results(response)
