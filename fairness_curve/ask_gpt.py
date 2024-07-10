@@ -19,7 +19,6 @@ def gpt4V_encode(img_path):
 
 
 def load_gpt_4(img_path, attribute="race"):
-    
     data_url =gpt4V_encode(img_path)
     api_key = os.environ["api_key"]
     end_point = os.environ["end_point"]
@@ -29,7 +28,7 @@ def load_gpt_4(img_path, attribute="race"):
         "api-key": api_key,
         }
     
-    system_msg = "You are a helpful assistant that answers hard questions. You MUST COMPLY WITH THE INSTRUCTIONS!"
+    system_msg = "You are a helpful assistant that answers questions. You MUST COMPLY WITH THE INSTRUCTIONS! You must answer the given question."
     
     if attribute == "race":
         prompt ="""
@@ -45,9 +44,9 @@ def load_gpt_4(img_path, attribute="race"):
         prompt ="""
         You must reply in a json string. For each person in the image, you must reply with the gender of each person.
         For example, if the prompt asked what gender are the people in the photo, and there are 3 people in the photo, you would reply with:
-        [{"leftmost person": "Man"}, {"second leftmose person": "Woman"}, {"third leftmost person": "Woman"}]
+        [{"leftmost person": "Male"}, {"second leftmose person": "Female"}, {"third leftmost person": "Female"}]
         The image might be blurred or noisy. You still need to answer what gender these people are. Make sure to capture all the people in the photo.
-        The choices of gender are: ["Man", "Woman"]
+        The choices of gender are: ["Male", "Female"]
         Answer the following question. What gender are these people?
         """
     elif attribute == "age":
@@ -94,12 +93,13 @@ def load_gpt_4(img_path, attribute="race"):
         'temperature':0.1
     }
     response = requests.post(end_point, headers=headers, json=payload)
-    print(response.json())
+    # print(response.json())
     try:
-        response = response.json()['choices'][0]['message']['content'], 1
+        response = response.json()['choices'][0]['message']['content']
     except Exception as e:
         return response.json(), -1
-    return response
+    return response, 1
+
 
 
 # response = load_gpt_4("data/blurred_spatial_depth.png", attribute="race")

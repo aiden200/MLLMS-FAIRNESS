@@ -247,7 +247,9 @@ def experiment_1(folder):
             print(f"{file} in dic, skipping")
     
     results = calculate_metrics_from_results(done)
-    print(results)
+    print(json.dumps(done, indent=4))
+    print(json.dumps(results, indent=4))
+
             
     
             
