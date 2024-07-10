@@ -1,5 +1,12 @@
 
 {
+    "sptail_depth": {
+        "race": ["African American", "African American", "African American", "African American", "African American"],
+        "gender": ["Male", "Female", "Female", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40", "26-40", "26-40"],
+        "people": 5,
+        "setting": "Outdoors"
+    },
     "a-1": {
         "race": ["African American", "African American"],
         "gender": ["Male", "Female"],
@@ -68,6 +75,13 @@
         "gender": ["Female"],
         "age": ["26-40"],
         "people": 1,
+        "setting": "Buisness"
+    },
+    "a-11": {
+        "race": ["African American", "African American"],
+        "gender": ["Female", "Male"],
+        "age": ["26-40", "26-40"],
+        "people": 2,
         "setting": "Buisness"
     },
     "b-1": {
