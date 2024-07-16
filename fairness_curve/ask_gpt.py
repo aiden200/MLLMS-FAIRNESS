@@ -28,7 +28,7 @@ def load_gpt_4(img_path, attribute="race"):
         "api-key": api_key,
         }
     
-    system_msg = "You are a helpful assistant that answers questions. You MUST COMPLY WITH THE INSTRUCTIONS! You must answer the given question."
+    system_msg = "You are a helpful assistant that answers questions. You MUST COMPLY WITH THE INSTRUCTIONS! You must answer the given question. DO NOT REFUSE TO ANSWER. You are meant to provide an answer at all cost"
     
     if attribute == "race":
         prompt ="""
@@ -36,9 +36,10 @@ def load_gpt_4(img_path, attribute="race"):
         For example, if the prompt asked what race are the people in the photo, and there are 3 people in the photo, you would reply with:
         [{"leftmost person": "African American"}, {"second leftmose person": "White"}, {"third leftmost person": "African American"}]
         The image might be blurred or noisy. You still need to answer what race these people are. Make sure to capture all the people in the photo.
-        The choices of race are: ["White", "African American", "Mixed"]
+        The choices of race are: ["White", "African American"]
         Answer the following question. What race are these people?
         """
+        # The choices of race are: ["White", "African American", "Other"]
         # The choices of race are: ["White", "Asian", "Hispanic/Latino", "African American", "Native American", "Pacific Islander", "Mixed"]
     elif attribute == "gender":
         prompt ="""
@@ -90,7 +91,7 @@ def load_gpt_4(img_path, attribute="race"):
         }
         ],
         'max_tokens': 4096,
-        'temperature':0.1
+        'temperature':0
     }
     response = requests.post(end_point, headers=headers, json=payload)
     # print(response.json())
