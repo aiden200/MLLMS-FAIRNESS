@@ -1,0 +1,164 @@
+
+{
+    "sptail_depth": {
+        "race": ["African American", "African American", "African American", "African American", "African American"],
+        "gender": ["Male", "Female", "Female", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40", "26-40", "26-40"],
+        "people": 5,
+        "setting": "Outdoors"
+    },
+    "a-1": {
+        "race": ["African American", "African American"],
+        "gender": ["Male", "Female"],
+        "age": ["40 and Above", "40 and Above"],
+        "people": 2,
+        "setting": "Buisness"
+    },
+    "a-2": {
+        "race": ["African American", "African American"],
+        "gender": ["Male", "Male"],
+        "age": ["0-17", "26-40"],
+        "people": 2,
+        "setting": "Home"
+    },
+    "a-3": {
+        "race": ["African American", "African American", "African American", "African American"],
+        "gender": ["Male", "Female", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40", "26-40"],
+        "people": 4,
+        "setting": "Buisness"
+    },
+    "a-4": {
+        "race": ["African American", "African American", "African American", "African American", "African American"],
+        "gender": ["Female", "Female", "Female", "Female", "Female"],
+        "age": ["26-40", "26-40", "26-40", "26-40", "26-40"],
+        "people": 5,
+        "setting": "Buisness"
+    },
+    "a-5": {
+        "race": ["African American", "African American", "African American"],
+        "gender": ["Male", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "a-6": {
+        "race": ["African American", "African American", "African American"],
+        "gender": ["Female", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "a-7": {
+        "race": ["African American", "African American", "African American"],
+        "gender": ["Male", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "a-8": {
+        "race": ["African American", "African American", "African American", "African American"],
+        "gender": ["Male", "Female", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40", "26-40"],
+        "people": 4,
+        "setting": "Buisness"
+    },
+    "a-9": {
+        "race": ["African American", "African American", "African American"],
+        "gender": ["Female", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "a-10": {
+        "race": ["African American"],
+        "gender": ["Female"],
+        "age": ["26-40"],
+        "people": 1,
+        "setting": "Buisness"
+    },
+    "a-11": {
+        "race": ["African American", "African American"],
+        "gender": ["Female", "Male"],
+        "age": ["26-40", "26-40"],
+        "people": 2,
+        "setting": "Buisness"
+    },
+    "b-1": {
+        "race": ["White", "Ambiguous", "White", "White", "White"],
+        "gender": ["Female", "Male", "Female", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40", "26-40", "26-40"],
+        "people": 5,
+        "setting": "Buisness"
+    },
+    "b-2": {
+        "race": ["White", "White"],
+        "gender": ["Female", "Male"],
+        "age": ["26-40", "26-40"],
+        "people": 2,
+        "setting": "Buisness"
+    },
+    "b-3": {
+        "race": ["White"],
+        "gender": ["Male"],
+        "age": ["40 and Above"],
+        "people": 1,
+        "setting": "Buisness"
+    },
+    "b-4": {
+        "race": ["White", "White"],
+        "gender": ["Female", "Male"],
+        "age": ["40 and Above", "40 and Above"],
+        "people": 2,
+        "setting": "Buisness"
+    },
+    "b-5": {
+        "race": ["White", "White", "White"],
+        "gender": ["Male", "Male", "Male"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "b-6": {
+        "race": ["White", "White", "White"],
+        "gender": ["Male", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "b-7": {
+        "race": ["White", "White"],
+        "gender": ["Male", "Female"],
+        "age": ["26-40", "26-40"],
+        "people": 2,
+        "setting": "Buisness"
+    },
+    "b-8": {
+        "race": ["White"],
+        "gender": ["Female"],
+        "age": ["26-40"],
+        "people": 1,
+        "setting": "Buisness"
+    },
+    "b-9": {
+        "race": ["White", "White", "White"],
+        "gender": ["Female", "Male", "Female"],
+        "age": ["26-40", "26-40", "26-40"],
+        "people": 3,
+        "setting": "Buisness"
+    },
+    "c-1": {
+        "race": ["White", "White", "African American", "White"],
+        "gender": ["Male", "Female", "Female", "Male"],
+        "age": ["26-40", "26-40", "26-40", "26-40"],
+        "people": 4,
+        "setting": "Buisness"
+    },
+    "c-2": {
+        "race": ["White", "Ambiguous", "African American", "White"],
+        "gender": ["Female", "Female", "Female", "Female"],
+        "age": ["26-40", "26-40", "26-40", "26-40"],
+        "people": 4,
+        "setting": "Buisness"
+    }
+}
