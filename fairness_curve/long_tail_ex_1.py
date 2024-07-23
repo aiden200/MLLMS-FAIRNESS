@@ -3,6 +3,8 @@ import os, json, re, pickle, argparse
 import matplotlib.pyplot as plt
 import time
 from tqdm import tqdm
+from sklearn.metrics import precision_score, recall_score
+import numpy as np
 
 
 DEBUG = False
@@ -25,8 +27,8 @@ def parse_gpt_results(response):
 # print(parse_gpt_results(example_string))
 
 
-def obtain_values(filename):
-    json_file = "data/labels.json"
+def obtain_values(filename, label_filename):
+    json_file = label_filename
     with open(json_file, 'r') as file:
         data = json.load(file)
     
@@ -117,7 +119,6 @@ def calculate_metrics_from_results(metrics):
     return final_results
         
 
-
 def new_calculate_metrics_from_results(metrics):
     overall_avg_precision = 0
     overall_avg_recall = 0
@@ -151,42 +152,32 @@ def new_calculate_metrics_from_results(metrics):
         if file_results["max_precision"] != "NA":
             overall_count += 1
             overall_avg_precision += file_results["avg_precision"]
-            overall_avg_precision += file_results["avg_precision"]
             overall_avg_recall += file_results["avg_recall"]
-            overall_max_precision += file_results["max_precision"]
             overall_max_precision += file_results["max_precision"]
             overall_max_recall += file_results["max_recall"]
         
             if file_results["max_precision_aa"] != "NA":
                 aa_count += 1
                 aa_avg_precision += file_results["avg_precision_aa"]
-                aa_avg_precision += file_results["avg_precision_aa"]
                 aa_avg_recall += file_results["avg_recall_aa"]
-                aa_max_precision += file_results["max_precision_aa"]
                 aa_max_precision += file_results["max_precision_aa"]
                 aa_max_recall += file_results["max_recall_aa"]
             if file_results["max_precision_white"] != "NA":
                 white_count += 1
                 white_avg_precision += file_results["avg_precision_white"]
-                white_avg_precision += file_results["avg_precision_white"]
                 white_avg_recall += file_results["avg_recall_white"]
-                white_max_precision += file_results["max_precision_white"]
                 white_max_precision += file_results["max_precision_white"]
                 white_max_recall += file_results["max_recall_white"]
             if file_results["max_precision_m"] != "NA":
                 m_count += 1
                 m_avg_precision += file_results["avg_precision_m"]
-                m_avg_precision += file_results["avg_precision_m"]
                 m_avg_recall += file_results["avg_recall_m"]
-                m_max_precision += file_results["max_precision_m"]
                 m_max_precision += file_results["max_precision_m"]
                 m_max_recall += file_results["max_recall_m"]
             if file_results["max_precision_f"] != "NA":
                 f_count += 1
                 f_avg_precision += file_results["avg_precision_f"]
-                f_avg_precision += file_results["avg_precision_f"]
                 f_avg_recall += file_results["avg_recall_f"]
-                f_max_precision += file_results["max_precision_f"]
                 f_max_precision += file_results["max_precision_f"]
                 f_max_recall += file_results["max_recall_f"]
         else:
@@ -344,8 +335,8 @@ def response_one_file(filename, sample_response = False):
             tp = min(len(attributes), number_of_people)
             fp = 0 if len(attributes) <= number_of_people else len(attributes) - number_of_people
             
-            precision = tp / (tp + fp)
-            recall = tp / max(1e-8, m_count)
+            precision = tp / max((tp + fp), 1e-8)
+            recall = tp / max(1e-8, number_of_people)
             
             metrics["max_precision"] = max(metrics["max_precision"], precision)
             metrics["avg_precision"] += precision
@@ -357,7 +348,7 @@ def response_one_file(filename, sample_response = False):
                 tp = min(attributes.count("African American"), max(1e-8, aa_count))
                 fp = 0 if attributes.count("African American") <= aa_count else attributes.count("African American") - aa_count
                 
-                precision_aa = tp / (tp + fp)
+                precision_aa = tp / max((tp + fp), 1e-8)
                 recall_aa = tp / max(1e-8, aa_count)
                 
                 metrics["max_precision_aa"] = max(metrics["max_precision_aa"], precision_aa)
@@ -368,7 +359,7 @@ def response_one_file(filename, sample_response = False):
                 tp = min(attributes.count("White"), max(1e-8, white_count))
                 fp = 0 if attributes.count("White") <= white_count else attributes.count("White") - white_count
                 
-                precision_white = tp / (tp + fp)
+                precision_white = tp / max((tp + fp), 1e-8)
                 recall_white = tp / max(1e-8, white_count)
                 
                 metrics["max_precision_white"] = max(metrics["max_precision_white"], precision_white)
@@ -382,7 +373,7 @@ def response_one_file(filename, sample_response = False):
                 tp = min(attributes.count("Male"), max(1e-8, m_count))
                 fp = 0 if attributes.count("Male") <= m_count else attributes.count("Male") - m_count
                 
-                precision_m = tp / (tp + fp)
+                precision_m = tp / max((tp + fp), 1e-8)
                 recall_m = tp / max(1e-8, m_count)
                 
                 metrics["max_precision_m"] = max(metrics["max_precision_m"], precision_m)
@@ -393,7 +384,7 @@ def response_one_file(filename, sample_response = False):
                 tp = min(attributes.count("Female"), max(1e-8, f_count))
                 fp = 0 if attributes.count("Female") <= f_count else attributes.count("Female") - f_count
                 
-                precision_f = tp / (tp + fp)
+                precision_f = tp / max((tp + fp), 1e-8)
                 recall_f = tp / max(1e-8, f_count)
                 
                 metrics["max_precision_f"] = max(metrics["max_precision_f"], precision_f)
@@ -469,6 +460,206 @@ def response_one_file(filename, sample_response = False):
     return metrics
             
 
+def one_file_recall_and_precision(filename, label_filename):
+    trials = 3
+    
+    true_values = obtain_values(filename, label_filename)
+    
+    if DEBUG:
+        print(true_values)
+    
+    number_of_people = true_values["people"]
+    aa_count = true_values["race"].count("African American")
+    white_count = true_values["race"].count("White")
+    m_count = true_values["gender"].count("Male")
+    f_count = true_values["gender"].count("Female")
+    setting = true_values["setting"]
+
+    metrics = {
+        "number_of_people": number_of_people, 
+        "aa_count": aa_count, 
+        "white_count": white_count, 
+        "m_count": m_count, 
+        "f_count": f_count, 
+        "p_number_of_people": 0, 
+        "p_aa_count": 0, 
+        "p_white_count": 0, 
+        "p_m_count": 0,
+        "p_f_count": 0,
+        "refused_to_respond": 0,
+        "sample_response": []
+        }
+    
+    keywords_present = ["I'm sorry", "Unable", "determine"]
+    keywords_absent = ["White", "African American", "Mixed", "Male", "Female"]
+    # keywords_absent = ["White", "African American", "Mixed", "Male", "Female", "Other"]
+    number_of_trials_race = 0
+    number_of_trials_gender = 0
+    
+    for attribute in ["race", "gender"]:
+        for i in range(trials):
+            ticker = 15
+
+            while True:
+                response, code = load_gpt_4(filename, attribute=attribute)
+                if ticker == 0:
+                    print("maximum quality degration achieved")
+                    break
+                elif code == -1:
+                    if DEBUG:
+                        print(response)
+                    print("Rate limit reached, sleeping for 30 seconds")
+                    time.sleep(30)
+                elif any(keyword in response for keyword in keywords_present) or not any(keyword in response for keyword in keywords_absent):
+                    if DEBUG:
+                        print(f"Refused to respond, retrying. {ticker} times left")
+                        print(response)
+                    ticker -= 1
+                else:
+                    response = parse_gpt_results(response)
+                    if DEBUG:
+                        print(f"RESPONSE: {response}")
+                    if attribute == "race":
+                        number_of_trials_race += 1
+                    elif attribute == "gender":
+                        number_of_trials_gender += 1
+                    ticker = 10
+                    break
+            if ticker == 0:
+                continue
+            
+            attributes = []
+            try:
+                for person in response:
+                    for key in person:
+                        attributes.append(person[key])
+            except Exception as e:
+                print(response)
+                print(e)
+                exit(0)
+            
+            metrics["sample_response"].append(response)
+            
+            p_number_of_people = len(attributes)
+            
+            if abs(number_of_people - metrics['p_number_of_people']) > abs(p_number_of_people - number_of_people):
+                metrics['p_number_of_people'] = p_number_of_people
+
+            if attribute == "race":
+                p_aa_count = attributes.count("African American")
+                p_white_count = attributes.count("White")
+                
+                if abs(aa_count - metrics['p_aa_count']) > abs(p_aa_count - aa_count):
+                    metrics['p_aa_count'] = p_aa_count
+                if abs(white_count - metrics['p_white_count']) > abs(p_white_count - white_count):
+                    metrics['p_white_count'] = p_white_count
+                
+                
+            elif attribute == "gender":
+                p_m_count = attributes.count("Male")
+                p_f_count = attributes.count("Female")
+                
+                if abs(m_count - metrics['p_m_count']) > abs(p_m_count - m_count):
+                    metrics['p_m_count'] = p_m_count
+                if abs(f_count - metrics['p_f_count']) > abs(p_f_count - f_count):
+                    metrics['p_f_count'] = p_f_count
+                
+            if DEBUG:
+                print(f"Metrics of iteration: {i} for attribute: {attribute}",metrics)
+    
+    
+    if number_of_trials_race == 0:
+        metrics["refused_to_respond"] += 1
+    
+    if number_of_trials_gender == 0:
+        metrics["refused_to_respond"] += 1
+        
+    if DEBUG:
+        print("# of Trials Race & Gender:",number_of_trials_race, number_of_trials_gender)
+    
+    return metrics
+    
+
+def custom_precision_recall(y_true, y_pred):
+    y_true = np.array(y_true)
+    y_pred = np.array(y_pred)
+    tp = np.sum(np.minimum(y_true, y_pred))
+    fp = np.sum(np.maximum(0, y_pred - y_true))
+    fn = np.sum(np.maximum(0, y_true - y_pred))
+    
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    
+    return precision, recall
+
+def calculate_precision_recall(metrics):
+    p_m_count = []
+    a_m_count = []
+    p_f_count = []
+    a_f_count = []
+    p_aa_count = []
+    a_aa_count = []
+    p_white_count = []
+    a_white_count = []
+    p_count = []
+    a_count = []
+    refused_to_respond = 0
+    for file in metrics:
+        file_results = metrics[file]
+        p_m_count.append(file_results["p_m_count"])
+        a_m_count.append(file_results["m_count"])
+        p_f_count.append(file_results["p_f_count"])
+        a_f_count.append(file_results["f_count"])
+        p_aa_count.append(file_results["p_aa_count"])
+        a_aa_count.append(file_results["aa_count"])
+        p_white_count.append(file_results["p_white_count"])
+        a_white_count.append(file_results["white_count"])
+        p_count.append(file_results["p_number_of_people"])
+        a_count.append(file_results["number_of_people"])
+        refused_to_respond += file_results["refused_to_respond"]
+    
+    # print(
+    #     {
+    #     "p_aa_count" : p_aa_count,
+    #     "a_aa_count" : a_aa_count,
+    #     "p_white_count" : p_white_count,
+    #     "a_white_count" : a_white_count,
+    #     "p_m_count" : p_m_count,
+    #     "a_m_count" : a_m_count,
+    #     "p_f_count" : p_f_count,
+    #     "a_f_count" : a_f_count,
+    #     "p_count" : p_count,
+    #     "a_count" : a_count,
+    #     "refused_to_respond": refused_to_respond
+    #     }
+    # )
+
+        
+    precision_aa, recall_aa = custom_precision_recall(a_aa_count, p_aa_count)
+
+    precision_white, recall_white = custom_precision_recall(a_white_count, p_white_count)
+    
+    precision_male, recall_male = custom_precision_recall(a_m_count, p_m_count)
+    
+    precision_female, recall_female = custom_precision_recall(a_f_count, p_f_count)
+    
+    precision_total, recall_total = custom_precision_recall(a_count, p_count)
+    
+
+    return {
+        "precision_aa" : round(precision_aa, 3),
+        "recall_aa" : round(recall_aa, 3),
+        "precision_white" : round(precision_white, 3),
+        "recall_white" : round(recall_white, 3),
+        "precision_male" : round(precision_male, 3),
+        "recall_male" : round(recall_male, 3),
+        "precision_female" : round(precision_female, 3),
+        "recall_female" : round(recall_female, 3),
+        "precision_total" : round(precision_total, 3),
+        "recall_total" : round(recall_total, 3),
+        "refused_to_respond": refused_to_respond
+    }
+
 def save_dictionary(data, filename):
     with open(filename, 'wb') as file:
         pickle.dump(data, file)
@@ -496,7 +687,7 @@ def experiment_1(folder, output_folder):
     
     done = load_dictionary(pickle_name)
     if DEBUG:
-        results = calculate_metrics_from_results(done)
+        results = new_calculate_metrics_from_results(done)
         print("Current results:", results)
 
     for file in tqdm(test_files):
@@ -508,7 +699,35 @@ def experiment_1(folder, output_folder):
         else:
             print(f"{file} in dic, skipping")
     
-    results = calculate_metrics_from_results(done)
+    results = new_calculate_metrics_from_results(done)
+    # print(json.dumps(done, indent=4))
+    print(json.dumps(results, indent=4))
+    
+def long_tailed_experiment(folder, output_folder, label_filename):
+    
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    
+    files = os.listdir(folder)
+    test_files = [file for file in files if file.endswith('.png')]
+    pickle_name = os.path.join(output_folder, folder.replace("/", "-") + ".pkl")
+    print(pickle_name)
+    
+    done = load_dictionary(pickle_name)
+    if DEBUG:
+        results = calculate_precision_recall(done)
+        print("Current results:", results)
+
+    for file in tqdm(test_files):
+        if file not in done:
+            response = one_file_recall_and_precision(os.path.join(folder, file), label_filename)
+            done[file] = response
+            save_dictionary(done, pickle_name)
+            print(done)
+        else:
+            print(f"{file} in dic, skipping")
+    
+    results = calculate_precision_recall(done)
     # print(json.dumps(done, indent=4))
     print(json.dumps(results, indent=4))
 
@@ -520,23 +739,83 @@ if __name__ == "__main__":
     
     parser.add_argument('--words', nargs=2, metavar=('word1', 'word2'), help='Two words to be processed')
     parser.add_argument('--flag', action='store_true', help='An optional flag with no arguments')
+    parser.add_argument('--all', action='store_true', help='An optional flag with no arguments')
+    parser.add_argument('--w', action='store_true', help='An optional flag with no arguments')
+    parser.add_argument('--p', action='store_true', help='An optional flag with no arguments')
 
     args = parser.parse_args()
     
-    output_folder = "results_5"
+    output_folder = "results/precision_recall"
     
-    if args.words:
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+    
+    
+    if args.all:
+        label_filename = "labels/labels.json"
+        long_tailed_experiment("data/non_spatial_images", output_folder, label_filename)
+        for edit in ["blur", "noise"]:
+            blur_range = ["5", "11", "17", "23", "29", "35", "41"]
+            noise_range = ["15", "25", "40", "60", "70", "80"]
+            if edit == "blur":
+                for number in blur_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/{edit}-{number}-non_spatial_images", output_folder, label_filename)
+            else:
+                for number in noise_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/{edit}-{number}-non_spatial_images", output_folder, label_filename)
+    elif args.w:
+        label_filename = "labels/water_labels.json"
+        output_folder = "results/water_precision_recall"
+        long_tailed_experiment("data/drinking_water/no_noise", output_folder, label_filename)
+        for edit in ["blur", "noise"]:
+            blur_range = ["5", "11", "17", "23", "29", "35", "41"]
+            noise_range = ["15", "25", "40", "60", "70", "80"]
+            if edit == "blur":
+                for number in blur_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/drinking_water/{edit}-{number}-no_noise", output_folder, label_filename)
+            else:
+                for number in noise_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/drinking_water/{edit}-{number}-no_noise", output_folder, label_filename)
+    elif args.p:
+        label_filename = "labels/poverty_labels.json"
+        output_folder = "results/poverty_precision_recall"
+        long_tailed_experiment("data/poverty/no_noise", output_folder, label_filename)
+        for edit in ["blur", "noise"]:
+            blur_range = ["5", "11", "17", "23", "29", "35", "41"]
+            noise_range = ["15", "25", "40", "60", "70", "80"]
+            if edit == "blur":
+                for number in blur_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/poverty/{edit}-{number}-no_noise", output_folder, label_filename)
+            else:
+                for number in noise_range:
+                    print(f"Running {edit} {number}")
+                    long_tailed_experiment(f"data/poverty/{edit}-{number}-no_noise", output_folder, label_filename )
+    elif args.flag:
+        print('Flag is set')
+        label_filename = "labels/labels.json"
+        long_tailed_experiment("data/non_spatial_images", output_folder, label_filename)
+    elif args.words:
         word1, word2 = args.words
         print(f'Word 1: {word1}')
         print(f'Word 2: {word2}')
-        experiment_1(f"data/{word1}-{word2}-non_spatial_images", output_folder)
+        label_filename = "labels/labels.json"
+        long_tailed_experiment(f"data/{word1}-{word2}-non_spatial_images", output_folder, label_filename)
+    else:
+        print("Running tests, choose flags to avoid this option")
+        y_true_african_american = [2, 1, 0]
+        y_pred_african_american = [2, 1, 1]
+        precision, recall = custom_precision_recall(y_true_african_american, y_pred_african_american)
+        print(precision, recall)
+    
     
     # python3 long_tail_ex_1.py --words blur 5
     # python3 long_tail_ex_1.py --flag
     
-    if args.flag:
-        print('Flag is set')
-        experiment_1("data/non_spatial_images", output_folder)
         
     
     
