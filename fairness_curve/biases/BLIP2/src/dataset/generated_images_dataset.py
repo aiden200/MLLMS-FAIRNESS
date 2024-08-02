@@ -30,14 +30,14 @@ class GeneratedImagesDataset(Dataset):
                         }
                         self.data.append(d)
                 elif args.task == "gender":
-                    if "A person " in prompt or prompt == "A person":
-                        for i in range(5):
-                            d = {
-                                "image_path": f"{self.image_path}/{prompt.replace(' ', '_')}/{i}.png",
-                                "idx": i,
-                                "prompt": prompt
-                            }
-                            self.data.append(d)
+
+                    for i in range(10):
+                        d = {
+                            "image_path": f"{self.image_path}/{prompt.replace(' ', '_')}/{i}.png",
+                            "idx": i,
+                            "prompt": prompt
+                        }
+                        self.data.append(d)
     
     def __getitem__(self, index) -> tuple:
         datum: dict = self.data[index]

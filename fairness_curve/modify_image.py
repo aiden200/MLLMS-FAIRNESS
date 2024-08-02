@@ -32,7 +32,7 @@ def modify_folder(folder, modify_type):
                 add_noise(os.path.join(folder, file), 0, i, savepath=os.path.join(new_folder_full_path, file))
 
     if modify_type == "blur":
-        intensity = [5, 11, 17, 23, 29, 35]
+        intensity = [5, 11, 17, 23, 29, 35, 41]
         for i in intensity:
             
             new_folder_name = f"{modify_type}-{str(i)}-{last_component}"
@@ -42,8 +42,8 @@ def modify_folder(folder, modify_type):
             for file in pre_transformed_files:
                 blur(os.path.join(folder, file), i, savepath=os.path.join(new_folder_full_path, file))
 
-modify_folder("data/drinking_water/no_noise", "blur")
-modify_folder("data/drinking_water/no_noise", "noise")
+modify_folder("data/poverty/no_noise", "blur")
+modify_folder("data/poverty/no_noise", "noise")
 # blur("data/sptail_depth.png", 61, "data/blurred_spatial_depth.png")
 # add_noise("data/sptail_depth.png", 0, 140, "data/noised_spatial_depth.png")
 
