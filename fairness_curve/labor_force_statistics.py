@@ -62,13 +62,16 @@ def read_bls_data():
 
 
 
-def acquire_statistics(filename):
+def acquire_statistics(filename, fat_head=False):
     df = pd.read_csv(filename)
     df = df[~df['Occupation'].str.lower().str.contains('other')]
     df = df[~df['Occupation'].str.lower().str.contains('miscellaneous')]
     other_race_columns = df.columns[4:]
-    df['Other Races'] = df[other_race_columns].agg(sum, axis=1)
+    df['Other Races'] = df[other_race_columns].agg("sum", axis=1)
     # print(df.columns)
+    
+    if fat_head:
+        return df['Occupation'].to_list()
 
     male_dominant = df[df.Women < 10]
     female_dominant = df[df.Women > 90]
